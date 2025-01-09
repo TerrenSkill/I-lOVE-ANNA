@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Für Anna</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #ffefba, #ffffff);
+            color: #333;
+            text-align: center;
+        }
+        header {
+            background: #ff6f61;
+            color: white;
+            padding: 20px 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        section {
+            padding: 20px;
+        }
+        .love-letter {
+            font-style: italic;
+            margin: 20px auto;
+            max-width: 600px;
+            background: rgba(255, 239, 186, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .stars {
+            height: 300px;
+            background: black;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px white;
+            width: 5px;
+            height: 5px;
+            animation: twinkle 5s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Anna, ich liebe dich!</h1>
+    </header>
+    <section>
+        <p class="love-letter">
+            Mein Herz schlägt nur für dich, Anna. Jeder Tag mit dir ist ein Geschenk, und ich bin dankbar für dich. Diese Webseite ist nur ein kleiner Ausdruck meiner unendlichen Liebe zu dir. 💖
+        </p>
+    </section>
+    <section class="stars">
+        <!-- Sterne werden dynamisch erstellt -->
+    </section>
+</body>
+<script>
+    const starsContainer = document.querySelector('.stars');
+    for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDuration = `${2 + Math.random() * 3}s`;
+        starsContainer.appendChild(star);
+    }
+</script>
+</html>
