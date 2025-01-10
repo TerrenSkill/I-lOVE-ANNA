@@ -10,6 +10,7 @@
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to bottom, #f7f7f7, #e3e3e3);
             color: #333;
+            text-align: center;
         }
         header {
             background: #ff6f61;
@@ -35,53 +36,15 @@
             font-style: italic;
             margin-bottom: 20px;
         }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
         }
-        .gallery img {
-    width: 200px; /* Breite der Bilder */
-    height: auto; /* Höhe passt sich automatisch an */
-    border-radius: 10px; /* Abgerundete Ecken */
-    transition: transform 0.3s;
-        }
-        .gallery img:hover {
-            transform: scale(1.05);
-        }
-        .guestbook {
-            margin-top: 30px;
-        }
-        .guestbook textarea {
-            width: 100%;
-            height: 80px;
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .guestbook button {
-            padding: 10px 20px;
-            background: #ff6f61;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .guestbook button:hover {
-            background: #e65b50;
-        }
-        .messages {
-            margin-top: 20px;
-        }
-        .message {
-            background: #f7f7f7;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 4px solid #ff6f61;
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -92,37 +55,10 @@
     <div class="container">
         <p class="love-letter">Mein Herz schlägt nur für dich, Anna. Diese Seite ist ein Ausdruck meiner unendlichen Liebe für dich. 💖</p>
 
-        <!-- Galerie -->
-        <h2>Unsere schönsten Momente</h2>
-        <div class="gallery">
-            <img src="https://raw.githubusercontent.com/TerrenSkill/I-lOVE-ANNA/refs/heads/main/20241207_173939%20(1)%20(1).jpg" alt="Bild 1">
-        </div>
-
-        <!-- Gästebuch -->
-        <div class="guestbook">
-            <h2>Hinterlasse eine Nachricht</h2>
-            <textarea id="messageInput" placeholder="Schreibe etwas..."></textarea>
-            <button onclick="addMessage()">Nachricht senden</button>
-            <div class="messages" id="messagesContainer">
-                <!-- Nachrichten erscheinen hier -->
-            </div>
+        <!-- Bild -->
+        <div class="image-container">
+            <img src="https://raw.githubusercontent.com/TerrenSkill/I-lOVE-ANNA/refs/heads/main/20241207_173939%20(1)%20(1).jpg" alt="Anna und ich">
         </div>
     </div>
-    <script>
-        function addMessage() {
-            const messageInput = document.getElementById("messageInput");
-            const messagesContainer = document.getElementById("messagesContainer");
-            
-            if (messageInput.value.trim() !== "") {
-                const messageDiv = document.createElement("div");
-                messageDiv.className = "message";
-                messageDiv.textContent = messageInput.value;
-                messagesContainer.appendChild(messageDiv);
-                messageInput.value = ""; // Leert das Textfeld
-            } else {
-                alert("Bitte schreibe eine Nachricht!");
-            }
-        }
-    </script>
 </body>
 </html>
