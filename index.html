@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Für Anna</title>
+    <title>Für Anna 💖</title>
     <style>
         body {
             margin: 0;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom, #f7f7f7, #e3e3e3);
+            background: linear-gradient(to bottom, #ffefba, #ffffff);
             color: #333;
-            text-align: center;
+            line-height: 1.6;
         }
         header {
             background: #ff6f61;
@@ -21,7 +21,8 @@
         }
         header h1 {
             margin: 0;
-            font-size: 2.5em;
+            font-size: 2.8em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
         .container {
             max-width: 900px;
@@ -30,6 +31,7 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         .love-letter {
             text-align: center;
@@ -45,20 +47,130 @@
             height: auto;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+        .comments-section {
+            margin-top: 30px;
+        }
+        .comments-section textarea {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+        .comments-section button {
+            padding: 10px 20px;
+            background: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .comments-section button:hover {
+            background: #e65b50;
+        }
+        .comments {
+            margin-top: 20px;
+        }
+        .comment {
+            background: #f7f7f7;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ff6f61;
+            font-style: italic;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #ff6f61;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Anna, ich liebe dich!</h1>
+        <h1>Anna, ich liebe dich! 💖</h1>
     </header>
     <div class="container">
-        <p class="love-letter">Mein Herz schlägt nur für dich, Anna. Diese Seite ist ein Ausdruck meiner unendlichen Liebe für dich. 💖</p>
+        <p class="love-letter">Mein Herz schlägt nur für dich, Anna. Diese Seite ist ein Ausdruck meiner unendlichen Liebe für dich. 💕</p>
 
         <!-- Bild -->
         <div class="image-container">
-            <img src="https://raw.githubusercontent.com/TerrenSkill/I-lOVE-ANNA/refs/heads/main/20241207_173939%20(1)%20(1).jpg" alt="Anna und ich">
+            <img src="https://raw.githubusercontent.com/TerrenSkill/I-lOVE-ANNA/main/20241207_173939.jpg" alt="Anna und ich">
+        </div>
+
+        <!-- Kommentarfunktion -->
+        <div class="comments-section">
+            <h2>Hinterlasse eine Nachricht</h2>
+            <textarea id="commentInput" placeholder="Schreibe etwas Schönes..."></textarea>
+            <button onclick="addComment()">Nachricht senden</button>
+            <div class="comments" id="commentsContainer">
+                <!-- Kommentare erscheinen hier -->
+            </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Copyright © 2025 - Dieses Meisterwerk wurde mit viel Liebe von Anna & Dave erstellt. 💕<br>
+        Hinweis: Nachahmung nur mit ausdrücklicher Erlaubnis und einem Keks erlaubt! 🍪</p>
+        <p><a href="#">Zurück nach oben</a></p>
+    </footer>
+
+    <script>
+        // Kommentarfunktion
+        function addComment() {
+            const commentInput = document.getElementById("commentInput");
+            const commentsContainer = document.getElementById("commentsContainer");
+
+            if (commentInput.value.trim() !== "") {
+                const commentDiv = document.createElement("div");
+                commentDiv.className = "comment";
+                commentDiv.textContent = commentInput.value;
+
+                commentsContainer.appendChild(commentDiv);
+
+                // Speichere die Nachricht im lokalen Speicher
+                const comments = JSON.parse(localStorage.getItem("comments")) || [];
+                comments.push(commentInput.value);
+                localStorage.setItem("comments", JSON.stringify(comments));
+
+                commentInput.value = ""; // Leert das Textfeld
+            } else {
+                alert("Bitte schreibe eine Nachricht!");
+            }
+        }
+
+        // Lade gespeicherte Kommentare bei Seitenaufruf
+        document.addEventListener("DOMContentLoaded", () => {
+            const commentsContainer = document.getElementById("commentsContainer");
+            const comments = JSON.parse(localStorage.getItem("comments")) || [];
+
+            comments.forEach((comment) => {
+                const commentDiv = document.createElement("div");
+                commentDiv.className = "comment";
+                commentDiv.textContent = comment;
+                commentsContainer.appendChild(commentDiv);
+            });
+        });
+    </script>
 </body>
 </html>
