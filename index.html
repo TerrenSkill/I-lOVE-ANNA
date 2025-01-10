@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Eine liebevolle Widmung an Anna mit interaktiver Kommentarfunktion.">
+    <meta name="keywords" content="Liebe, Widmung, Anna, Kommentare, interaktiv">
+    <meta name="author" content="Anna & Dave">
     <title>Für Anna 💖</title>
     <style>
         body {
@@ -31,7 +34,6 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
         }
         .love-letter {
             text-align: center;
@@ -81,12 +83,28 @@
             margin-top: 20px;
         }
         .comment {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: #f7f7f7;
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 5px;
             border-left: 4px solid #ff6f61;
             font-style: italic;
+        }
+        .delete-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .delete-button:hover {
+            background: #e65b50;
         }
         footer {
             text-align: center;
@@ -120,9 +138,9 @@
         <!-- Kommentarfunktion -->
         <div class="comments-section">
             <h2>Hinterlasse eine Nachricht</h2>
-            <textarea id="commentInput" placeholder="Schreibe etwas Schönes..."></textarea>
+            <textarea id="commentInput" placeholder="Schreibe etwas Schönes..." aria-label="Kommentar schreiben"></textarea>
             <button onclick="addComment()">Nachricht senden</button>
-            <div class="comments" id="commentsContainer">
+            <div class="comments" id="commentsContainer" aria-live="polite">
                 <!-- Kommentare erscheinen hier -->
             </div>
         </div>
@@ -136,7 +154,12 @@
     </footer>
 
     <script>
-        // Kommentarfunktion
+        function sanitizeHTML(input) {
+            const element = document.createElement("div");
+            element.innerText = input;
+            return element.innerHTML;
+        }
+
         function addComment() {
             const commentInput = document.getElementById("commentInput");
             const commentsContainer = document.getElementById("commentsContainer");
@@ -144,22 +167,36 @@
             if (commentInput.value.trim() !== "") {
                 const commentDiv = document.createElement("div");
                 commentDiv.className = "comment";
-                commentDiv.textContent = commentInput.value;
 
+                const sanitizedComment = sanitizeHTML(commentInput.value);
+                const textNode = document.createTextNode(sanitizedComment);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "delete-button";
+                deleteButton.innerText = "Löschen";
+                deleteButton.onclick = () => {
+                    commentsContainer.removeChild(commentDiv);
+                    updateLocalStorage();
+                };
+
+                commentDiv.appendChild(textNode);
+                commentDiv.appendChild(deleteButton);
                 commentsContainer.appendChild(commentDiv);
 
-                // Speichere die Nachricht im lokalen Speicher
-                const comments = JSON.parse(localStorage.getItem("comments")) || [];
-                comments.push(commentInput.value);
-                localStorage.setItem("comments", JSON.stringify(comments));
+                updateLocalStorage();
 
-                commentInput.value = ""; // Leert das Textfeld
+                commentInput.value = "";
             } else {
                 alert("Bitte schreibe eine Nachricht!");
             }
         }
 
-        // Lade gespeicherte Kommentare bei Seitenaufruf
+        function updateLocalStorage() {
+            const commentsContainer = document.getElementById("commentsContainer");
+            const comments = Array.from(commentsContainer.children).map((comment) => comment.firstChild.textContent);
+            localStorage.setItem("comments", JSON.stringify(comments));
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const commentsContainer = document.getElementById("commentsContainer");
             const comments = JSON.parse(localStorage.getItem("comments")) || [];
@@ -167,7 +204,19 @@
             comments.forEach((comment) => {
                 const commentDiv = document.createElement("div");
                 commentDiv.className = "comment";
-                commentDiv.textContent = comment;
+
+                const textNode = document.createTextNode(comment);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "delete-button";
+                deleteButton.innerText = "Löschen";
+                deleteButton.onclick = () => {
+                    commentsContainer.removeChild(commentDiv);
+                    updateLocalStorage();
+                };
+
+                commentDiv.appendChild(textNode);
+                commentDiv.appendChild(deleteButton);
                 commentsContainer.appendChild(commentDiv);
             });
         });
