@@ -790,6 +790,48 @@
         }
 
         /* ===== RESPONSIVE ===== */
+        /* ===== HAMBURGER ===== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 44px; height: 44px;
+            padding: 10px;
+            margin-left: auto;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s;
+            z-index: 1001;
+            flex-shrink: 0;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px; height: 2px;
+            background: white;
+            border-radius: 2px;
+            transition: transform 0.35s ease, opacity 0.25s ease, background 0.3s;
+            transform-origin: center;
+        }
+
+        nav.scrolled .hamburger {
+            background: rgba(200,95,255,0.1);
+            border-color: rgba(200,95,255,0.3);
+        }
+        nav.scrolled .hamburger span { background: var(--deep); }
+
+        /* Hamburger → X Animation */
+        nav.open .hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        nav.open .hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        nav.open .hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        nav.open .hamburger { background: rgba(255,107,157,0.25); border-color: var(--pink); }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             nav { padding: 14px 22px; }
             nav.scrolled { padding: 10px 22px; }
@@ -800,8 +842,51 @@
             section { padding: 72px 18px; }
         }
 
-        @media (max-width: 520px) {
-            .nav-links { display: none; }
+        @media (max-width: 560px) {
+            .hamburger { display: flex; }
+
+            nav { padding: 14px 20px; }
+            nav.scrolled { padding: 10px 20px; }
+
+            /* Desktop-Links ausblenden, Mobile-Panel einblenden */
+            .nav-links {
+                position: fixed;
+                top: 0; left: 0; right: 0;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+                padding: 76px 0 28px;
+                background: rgba(18, 8, 36, 0.97);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                box-shadow: 0 12px 50px rgba(0,0,0,0.4);
+                transform: translateY(-110%);
+                transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1000;
+            }
+
+            nav.open .nav-links { transform: translateY(0); }
+
+            .nav-links li { border-bottom: 1px solid rgba(255,255,255,0.06); }
+            .nav-links li:last-child { border-bottom: none; }
+
+            .nav-links a {
+                display: block;
+                padding: 17px 28px;
+                font-size: 1.1em;
+                color: rgba(255,255,255,0.9) !important;
+                text-shadow: none !important;
+                letter-spacing: 1px;
+            }
+
+            .nav-links a:hover {
+                background: rgba(200,95,255,0.12);
+                color: white !important;
+                padding-left: 36px;
+            }
+
+            .nav-links a::after { display: none; }
+
             .gallery-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
         }
     </style>
@@ -810,12 +895,17 @@
 
     <!-- ===== NAVIGATION ===== -->
     <nav id="main-nav">
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-links">
             <li><a href="#hero">Start</a></li>
             <li><a href="#liebesbrief">Liebesbrief</a></li>
             <li><a href="#galerie">Galerie</a></li>
             <li><a href="#nachrichten">Nachrichten</a></li>
         </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menü öffnen" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
 
     <!-- ===== HERO ===== -->
@@ -1028,6 +1118,23 @@
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 50);
         }, { passive: true });
+
+        /* ===== HAMBURGER MENU ===== */
+        const hamburger = document.getElementById('hamburger');
+
+        hamburger.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            });
+        });
 
         /* ===== SCROLL REVEAL ===== */
         const revealEls = document.querySelectorAll('.reveal');
