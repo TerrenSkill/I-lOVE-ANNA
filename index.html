@@ -9,7 +9,7 @@
     <title>Canim &amp; Askim 💖</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -154,19 +154,13 @@
             animation: fade-in-down 0.9s ease both;
         }
 
-        .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3.8em, 11vw, 9em);
-            font-weight: 700;
-            font-style: italic;
-            color: white;
-            text-shadow:
-                0 4px 30px rgba(0,0,0,0.25),
-                0 0 80px rgba(255,215,0,0.35),
-                0 0 140px rgba(255,107,157,0.2);
-            line-height: 1.08;
-            margin-bottom: 24px;
-            animation: fade-in-up 1s ease 0.2s both;
+        #hero-title-canvas {
+            display: block;
+            width: min(900px, 98vw);
+            aspect-ratio: 900 / 340;
+            margin: 0 auto 24px;
+            overflow: hidden;
+            clip-path: inset(0);
         }
 
         .hero-subtitle {
@@ -1089,7 +1083,7 @@
     <section id="hero">
         <canvas id="hearts-canvas"></canvas>
         <div class="hero-content">
-            <h1 class="hero-title">Canim &amp; Askim 💖</h1>
+            <canvas id="hero-title-canvas" role="img" aria-label="Canim &amp; Askim"></canvas>
             <a href="#liebesbrief" class="hero-cta">Unsere Geschichte entdecken</a>
         </div>
         <div class="scroll-indicator">
@@ -1251,6 +1245,151 @@
     </footer>
 
     <script>
+        /* ===== HERO TITLE ANIMATION ===== */
+        (function () {
+            const canvas = document.getElementById('hero-title-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            /* Canvas dimensions: 900 × 340 logical px — CSS controls display size */
+            const W = 900, H = 340;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width  = W * dpr;
+            canvas.height = H * dpr;
+            ctx.scale(dpr, dpr);
+
+            const CX    = W / 2;   // 450
+            const HY    = 120;     // heart centre-y
+            const HS    = 110;     // heart size
+            const TY    = 270;     // text y
+            const TOTAL = 7000;
+
+            const C_L = '#f06a86';
+            const C_R = '#c41f43';
+            const C_M = '#d8254f';
+            const C_T = '#8a132e';
+
+            const lerp  = (a, b, t) => a + (b - a) * t;
+            const clamp = (v, lo=0, hi=1) => Math.max(lo, Math.min(hi, v));
+            const eio   = t => { t=clamp(t); return t<0.5 ? 2*t*t : -1+(4-2*t)*t; };
+            const eo3   = t => { t=clamp(t); return 1-Math.pow(1-t,3); };
+
+            function heartPath(cx, cy, s) {
+                const x = cx - s/2, y = cy - s/2;
+                ctx.beginPath();
+                ctx.moveTo(x+s/2, y+s/5);
+                ctx.bezierCurveTo(x+s/2, y,        x,     y,        x,     y+s/5);
+                ctx.bezierCurveTo(x,     y+s*.55,   x+s/2, y+s*.77,  x+s/2, y+s);
+                ctx.bezierCurveTo(x+s/2, y+s*.77,   x+s,   y+s*.55,  x+s,   y+s/5);
+                ctx.bezierCurveTo(x+s,   y,          x+s/2, y,        x+s/2, y+s/5);
+                ctx.closePath();
+            }
+
+            /* Double-pass: white halo → coloured fill → coloured glow */
+            function fillHeart(cx, cy, size, color, alpha, glow=0) {
+                ctx.save();
+                ctx.globalAlpha = clamp(alpha);
+
+                if (glow) {
+                    /* pass 1 – white outer glow */
+                    ctx.shadowColor = 'rgba(255,255,255,0.70)';
+                    ctx.shadowBlur  = glow * 2.2;
+                    ctx.fillStyle   = color;
+                    heartPath(cx, cy, size);
+                    ctx.fill();
+
+                    /* pass 2 – coloured glow */
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur  = glow;
+                }
+
+                ctx.fillStyle = color;
+                heartPath(cx, cy, size);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            /* type: 'name' = white + purple glow | 'amp' = gold + orange glow */
+            function fillText(text, x, y, fs, alpha, type='name') {
+                ctx.save();
+                ctx.globalAlpha  = clamp(alpha);
+                ctx.font         = `italic ${fs}px 'Cormorant Garamond', Georgia, serif`;
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'middle';
+                if (type === 'name') {
+                    ctx.shadowColor = '#C85FFF';
+                    ctx.shadowBlur  = 30;
+                    ctx.fillStyle   = '#ffffff';
+                } else {
+                    ctx.shadowColor = '#FF9A3C';
+                    ctx.shadowBlur  = 25;
+                    ctx.fillStyle   = '#FFD700';
+                }
+                ctx.fillText(text, x, y);
+                ctx.restore();
+            }
+
+            function render(t) {
+                ctx.clearRect(0, 0, W, H);
+
+                const fade = t > 6300 ? 1 - eio((t-6300)/700) : 1;
+
+                /* --- PHASE 1: APPROACH  0 → 2500ms --- */
+                if (t < 2500) {
+                    const pt = eio(t / 2500);
+                    fillHeart(lerp(-(HS * 2),    380, pt), HY, HS, C_L, fade, 20);
+                    fillHeart(lerp(W + (HS * 2), 520, pt), HY, HS, C_R, fade, 20);
+                }
+
+                /* --- PHASE 2: MERGE  2500 → 3500ms --- */
+                if (t >= 2500 && t < 3500) {
+                    const mt  = eio((t - 2500) / 1000);
+                    const lx  = lerp(380, CX, mt);
+                    const rx  = lerp(520, CX, mt);
+                    const sep = (1 - mt) * fade;
+                    const mrg = mt * fade;
+                    const pls = 1 + Math.sin(mt * Math.PI) * 0.28;
+
+                    if (sep > 0.02) {
+                        fillHeart(lx, HY, HS,       C_L, sep, 16);
+                        fillHeart(rx, HY, HS,       C_R, sep, 16);
+                    }
+                    fillHeart(CX, HY, HS * pls, C_M, mrg, 44);
+                }
+
+                /* --- PHASE 3+4+5: TEXT + HOLD + FADE  3500 → 7000ms --- */
+                if (t >= 3500) {
+                    const dt = t - 3500;
+
+                    const bounce = 1 + (dt < 600 ? 0.18 * Math.sin(dt / 600 * Math.PI) : 0);
+                    fillHeart(CX, HY, HS * bounce, C_M, fade, 28);
+
+                    /* "Canim" – H×0.30 = 96px, weiß + lila Schatten */
+                    const caA = eo3(clamp(dt / 700));
+                    const caX = lerp(CX, 177, eio(clamp(dt / 900)));
+                    fillText('Canim', caX, TY, Math.round(H * 0.30), caA * fade, 'name');
+
+                    /* "&" – H×0.22 = 70px, gold + oranger Schatten */
+                    const amA = eo3(clamp((dt - 320) / 480));
+                    fillText('&', CX, TY + 2, Math.round(H * 0.22), amA * fade, 'amp');
+
+                    /* "Askim" – delayed 160ms, weiß + lila Schatten */
+                    const asA = eo3(clamp((dt - 160) / 700));
+                    const asX = lerp(CX, 723, eio(clamp((dt - 160) / 900)));
+                    fillText('Askim', asX, TY, Math.round(H * 0.30), asA * fade, 'name');
+                }
+            }
+
+            let t0 = null;
+            function loop(ts) {
+                if (!t0) t0 = ts;
+                render((ts - t0) % TOTAL);
+                requestAnimationFrame(loop);
+            }
+
+            document.fonts.ready.then(() => requestAnimationFrame(loop));
+        })();
+
         /* ===== CANVAS FLOATING HEARTS ===== */
         const canvas = document.getElementById('hearts-canvas');
         const ctx    = canvas.getContext('2d');
